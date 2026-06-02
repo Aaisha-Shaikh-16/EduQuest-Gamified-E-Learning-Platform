@@ -2,9 +2,9 @@ import pymysql
 
 conn = pymysql.connect(
     host='localhost',
-    user='root',          # your MySQL username
-    password='Aaisha',    # your MySQL password
-    db='eduquest',        # your database name
+    user='root',                  # your MySQL username
+    password='mysql_password',    # your MySQL password
+    db='eduquest',                # your database name
     charset='utf8mb4'
 )
 
