@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block title %}Manage Quizzes - {{ course.course_name }}{% endblock %}
+
+{% block content %}
+<div class="admin-page-wrapper-padded">
+  <div class="container">
+    <a href="{{ url_for('admin_course_lessons', course_id=course.course_id) }}" class="admin-back-link">← Back to Lessons</a>
+
+    <div class="admin-page-header-top">
+      <div>
+        <h2>❓ Quizzes</h2>
+        <p class="admin-page-subtitle">{{ course.course_name }}</p>
+      </div>
+      <a href="{{ url_for('add_quiz', course_id=course.course_id) }}" class="btn-admin-add">➕ Add Quiz</a>
+    </div>
+
+    {% if quizzes %}
+    <div class="admin-table-wrapper">
+      <div class="admin-table-head admin-cols-quizzes">
+        {% for col in ['Question', 'Linked Lesson', 'Answer', 'Actions'] %}
+        <span>{{ col }}</span>
+        {% endfor %}
+      </div>
+      {% for quiz in quizzes %}
+      <div class="admin-table-row admin-cols-quizzes">
+        <span class="admin-cell-muted">{{ quiz.question[:60] }}...</span>
+        <div>
+          {% if quiz.lesson %}
+            <span class="badge-pill badge-lesson-link">{{ quiz.lesson.title[:20] }}</span>
+          {% else %}
+            <span class="admin-cell-muted">Not linked</span>
+          {% endif %}
+        </div>
+        <span class="badge-pill badge-answer">{{ quiz.correct_opt }}</span>
+        <div class="admin-cell-actions">
+          <a href="{{ url_for('edit_quiz', quiz_id=quiz.quiz_id) }}" class="btn-action btn-action-edit">Edit</a>
+          <form method="POST" action="{{ url_for('delete_quiz', quiz_id=quiz.quiz_id) }}" class="d-inline" onsubmit="return confirm('Delete this quiz?');">
+            <button type="submit" class="btn-action btn-action-delete">Delete</button>
+          </form>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <div class="admin-info-box">
+      ℹ️ No quizzes yet. Create one to get started!
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

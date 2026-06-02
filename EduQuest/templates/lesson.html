@@ -1,0 +1,145 @@
+{% extends "base.html" %}
+{% block title %}{{ lesson.title }} - EduQuest{% endblock %}
+
+{% block content %}
+<div style="min-height: 100vh; background: linear-gradient(135deg, #0d0d1a 0%, #1a0533 50%, #0d1a2e 100%); padding: 2rem 0;">
+  <div class="container">
+    <div class="row">
+
+      <!-- Sidebar -->
+      <div class="col-lg-3 mb-4">
+        <div style="background: rgba(255,255,255,0.05); border: 1px solid rgba(167,139,250,0.2); border-radius: 1rem; padding: 1.25rem; backdrop-filter: blur(10px); position: sticky; top: 80px;">
+          <a href="{{ url_for('course_detail', course_id=course.course_id) }}"
+             style="color: #a78bfa; text-decoration: none; font-weight: 600; font-size: 0.9rem; display: flex; align-items: center; gap: 0.4rem; margin-bottom: 1rem;">
+            ← Back to Course
+          </a>
+          <h6 style="color: #ffffff; font-weight: 700; margin-bottom: 0.75rem;">Course Lessons</h6>
+          <hr style="border-color: rgba(167,139,250,0.15); margin-bottom: 0.75rem;">
+          <div style="display: flex; flex-direction: column; gap: 0.3rem;">
+            {% for l in all_lessons %}
+              {% set l_progress = l.progress|selectattr('user_id', 'equalto', current_user.user_id)|first %}
+              <a href="{{ url_for('view_lesson', lesson_id=l.lesson_id) }}"
+                 style="display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 0.75rem; border-radius: 0.5rem; text-decoration: none; font-size: 0.82rem; transition: background 0.2s;
+                 {% if l.lesson_id == lesson.lesson_id %}background: rgba(124,58,237,0.3); color: #ffffff; border: 1px solid rgba(167,139,250,0.4);
+                 {% else %}color: #94a3b8; border: 1px solid transparent;{% endif %}"
+                 onmouseover="if('{{ l.lesson_id }}' !== '{{ lesson.lesson_id }}') this.style.background='rgba(255,255,255,0.06)'"
+                 onmouseout="if('{{ l.lesson_id }}' !== '{{ lesson.lesson_id }}') this.style.background='transparent'">
+                <span>{{ l.lesson_order }}. {{ l.title }}</span>
+                {% if l_progress and l_progress.completed %}
+                  <span style="color: #4ade80; font-size: 0.8rem;">✅</span>
+                {% endif %}
+              </a>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+
+      <!-- Main Content -->
+      <div class="col-lg-9">
+        <div style="background: rgba(255,255,255,0.05); border: 1px solid rgba(167,139,250,0.2); border-radius: 1rem; padding: 2rem; backdrop-filter: blur(10px);">
+
+          <!-- Badges -->
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+            <div style="display: flex; gap: 0.5rem;">
+              <span style="background: rgba(100,116,139,0.2); color: #94a3b8; border: 1px solid rgba(100,116,139,0.3); padding: 0.25rem 0.75rem; border-radius: 999px; font-size: 0.8rem; font-weight: 600;">Lesson {{ lesson.lesson_order }}</span>
+              <span style="background: rgba(56,189,248,0.15); color: #38bdf8; border: 1px solid rgba(56,189,248,0.3); padding: 0.25rem 0.75rem; border-radius: 999px; font-size: 0.8rem; font-weight: 600;">{{ lesson.lesson_type|capitalize }}</span>
+            </div>
+            <span style="background: rgba(245,158,11,0.15); color: #f59e0b; border: 1px solid rgba(245,158,11,0.3); padding: 0.25rem 0.75rem; border-radius: 999px; font-size: 0.8rem; font-weight: 700;">⭐ {{ lesson.xp_reward }} XP</span>
+          </div>
+
+          <h1 style="color: #ffffff; font-weight: 800; font-size: 1.8rem; margin-bottom: 1.5rem;">{{ lesson.title }}</h1>
+
+          {% if progress and progress.completed %}
+            <div style="background: rgba(74,222,128,0.1); border: 1px solid rgba(74,222,128,0.25); border-radius: 0.75rem; padding: 0.85rem 1rem; margin-bottom: 1.5rem; color: #4ade80; font-weight: 600;">
+              ✅ Lesson completed on {{ progress.completed_at.strftime('%B %d, %Y') }}
+            </div>
+          {% endif %}
+
+          <!-- Lesson Content -->
+          <div class="lesson-content mb-4">
+            {{ lesson.content|safe }}
+          </div>
+
+          <hr style="border-color: rgba(167,139,250,0.15); margin: 1.5rem 0;">
+
+          <!-- Lesson Quiz -->
+          {% set lesson_quiz = lesson.quizzes|first %}
+          {% if lesson_quiz %}
+            <div style="background: rgba(124,58,237,0.08); border: 1px solid rgba(167,139,250,0.25); border-radius: 1rem; padding: 1.5rem; margin-bottom: 1.5rem;">
+              <h4 style="color: #ffffff; font-weight: 700; margin-bottom: 1.25rem;">❓ Lesson Quiz</h4>
+
+              <form method="POST" action="{{ url_for('quiz', quiz_id=lesson_quiz.quiz_id) }}">
+                <p style="color: #e2d9f3; font-weight: 600; margin-bottom: 1rem;">{{ lesson_quiz.question }}</p>
+
+                {% for val, label in [('A', lesson_quiz.opt_a), ('B', lesson_quiz.opt_b), ('C', lesson_quiz.opt_c), ('D', lesson_quiz.opt_d)] %}
+                <div style="margin-bottom: 0.6rem;">
+                  <label style="display: flex; align-items: center; gap: 0.75rem; background: rgba(255,255,255,0.04); border: 1px solid rgba(167,139,250,0.15); border-radius: 0.6rem; padding: 0.75rem 1rem; cursor: pointer; color: #cbd5e1; transition: background 0.2s;"
+                         onmouseover="this.style.background='rgba(124,58,237,0.15)'; this.style.borderColor='rgba(167,139,250,0.4)'"
+                         onmouseout="this.style.background='rgba(255,255,255,0.04)'; this.style.borderColor='rgba(167,139,250,0.15)'">
+                    <input type="radio" name="answer" value="{{ val }}" id="quiz_opt_{{ val|lower }}" required style="accent-color: #7c3aed;">
+                    <span><strong style="color: #a78bfa;">{{ val }})</strong> {{ label }}</span>
+                  </label>
+                </div>
+                {% endfor %}
+
+                <button type="submit" style="margin-top: 1rem; background: linear-gradient(135deg, #7c3aed, #6d28d9); color: #fff; padding: 0.65rem 1.5rem; border-radius: 0.6rem; border: none; font-weight: 700; cursor: pointer; box-shadow: 0 4px 12px rgba(124,58,237,0.4);">
+                  ✔ Submit Answer
+                </button>
+              </form>
+
+              {% if progress and progress.completed %}
+                <div style="background: rgba(74,222,128,0.1); border: 1px solid rgba(74,222,128,0.25); border-radius: 0.6rem; padding: 0.75rem 1rem; margin-top: 1rem; color: #4ade80; font-weight: 600;">
+                  ✅ You've completed this lesson!
+                </div>
+              {% endif %}
+            </div>
+            <hr style="border-color: rgba(167,139,250,0.15); margin-bottom: 1.5rem;">
+          {% endif %}
+
+          <!-- Prev / Next Navigation -->
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div>
+              {% set prev_lesson = all_lessons[all_lessons.index(lesson) - 1] if all_lessons.index(lesson) > 0 else None %}
+              {% if prev_lesson %}
+                <a href="{{ url_for('view_lesson', lesson_id=prev_lesson.lesson_id) }}"
+                   style="color: #a78bfa; border: 1px solid rgba(167,139,250,0.3); padding: 0.55rem 1.1rem; border-radius: 0.6rem; text-decoration: none; font-weight: 600; font-size: 0.9rem; transition: background 0.2s;"
+                   onmouseover="this.style.background='rgba(124,58,237,0.15)'"
+                   onmouseout="this.style.background='transparent'">
+                  ← Previous
+                </a>
+              {% endif %}
+            </div>
+            <div>
+              {% set next_lesson = all_lessons[all_lessons.index(lesson) + 1] if all_lessons.index(lesson) < all_lessons|length - 1 else None %}
+              {% if next_lesson %}
+                <a href="{{ url_for('view_lesson', lesson_id=next_lesson.lesson_id) }}"
+                   style="background: linear-gradient(135deg, #7c3aed, #6d28d9); color: #fff; padding: 0.55rem 1.25rem; border-radius: 0.6rem; text-decoration: none; font-weight: 700; font-size: 0.9rem; box-shadow: 0 3px 12px rgba(124,58,237,0.4);">
+                  Next →
+                </a>
+              {% else %}
+                <a href="{{ url_for('course_detail', course_id=course.course_id) }}"
+                   style="background: linear-gradient(135deg, #059669, #10b981); color: #fff; padding: 0.55rem 1.25rem; border-radius: 0.6rem; text-decoration: none; font-weight: 700; font-size: 0.9rem; box-shadow: 0 3px 12px rgba(5,150,105,0.4);">
+                  Finish Course 🏆
+                </a>
+              {% endif %}
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% block extra_css %}
+<style>
+.lesson-content { font-size: 1.05rem; line-height: 1.85; color: #cbd5e1; }
+.lesson-content h3 { color: #a78bfa; margin-top: 1.5rem; margin-bottom: 0.75rem; }
+.lesson-content h4 { color: #38bdf8; margin-top: 1.25rem; margin-bottom: 0.6rem; }
+.lesson-content pre { background: rgba(0,0,0,0.4); color: #e2e8f0; padding: 1rem 1.25rem; border-radius: 0.75rem; border-left: 4px solid #7c3aed; overflow-x: auto; }
+.lesson-content code { color: #a78bfa; background: rgba(124,58,237,0.15); padding: 0.1rem 0.4rem; border-radius: 0.3rem; }
+.lesson-content p { margin-bottom: 1rem; }
+.lesson-content ul, .lesson-content ol { color: #cbd5e1; padding-left: 1.5rem; margin-bottom: 1rem; }
+</style>
+{% endblock %}
+{% endblock %}

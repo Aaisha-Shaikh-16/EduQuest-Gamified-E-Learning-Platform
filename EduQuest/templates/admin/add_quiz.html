@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block title %}Add Quiz - Admin{% endblock %}
+
+{% block content %}
+<div class="admin-page-wrapper-padded">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-lg-8">
+        <div class="admin-form-card">
+          <h2 class="admin-form-title">➕ Add Quiz</h2>
+          <form method="POST" action="{{ url_for('add_quiz', course_id=course.course_id) }}">
+            
+            <div class="admin-form-group">
+              <label class="admin-label">Question</label>
+              <textarea name="question" rows="4" required class="admin-textarea" placeholder="Enter the quiz question"></textarea>
+            </div>
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label class="admin-label">Option A</label>
+                <input type="text" name="opt_a" required class="admin-input" placeholder="Option A">
+              </div>
+              <div class="col-md-6 mb-3">
+                <label class="admin-label">Option B</label>
+                <input type="text" name="opt_b" required class="admin-input" placeholder="Option B">
+              </div>
+              <div class="col-md-6 mb-3">
+                <label class="admin-label">Option C</label>
+                <input type="text" name="opt_c" required class="admin-input" placeholder="Option C">
+              </div>
+              <div class="col-md-6 mb-3">
+                <label class="admin-label">Option D</label>
+                <input type="text" name="opt_d" required class="admin-input" placeholder="Option D">
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label class="admin-label">Correct Answer</label>
+                <select name="correct_opt" required class="admin-select">
+                  <option value="A">A</option>
+                  <option value="B">B</option>
+                  <option value="C">C</option>
+                  <option value="D">D</option>
+                </select>
+              </div>
+              <div class="col-md-6 mb-3">
+                <label class="admin-label">Linked to Lesson </label>
+                <select name="lesson_id" class="admin-select">
+                  <option value="">-- No lesson --</option>
+                  {% for lesson in lessons %}
+                  <option value="{{ lesson.lesson_id }}">{{ lesson.title }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+            <div class="admin-form-actions">
+              <button type="submit" class="btn-admin-save">💾 Add Quiz</button>
+              <a href="{{ url_for('admin_course_quizzes', course_id=course.course_id) }}" class="btn-admin-cancel">✕ Cancel</a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

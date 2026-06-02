@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% block title %}Manage Lessons - {{ course.course_name }}{% endblock %}
+
+{% block content %}
+<div class="admin-page-wrapper">
+  <div class="container-fluid">
+    <div class="row">
+
+      <div class="col-md-2 admin-sidebar-col">
+        <div class="admin-sidebar-inner">
+          <h6 class="admin-sidebar-title">Admin Panel</h6>
+          <div class="admin-nav">
+            <a href="{{ url_for('admin_dashboard') }}" class="admin-nav-link">📊 Dashboard</a>
+            <a href="{{ url_for('admin_courses') }}" class="admin-nav-link active">📚 Courses</a>
+            <a href="{{ url_for('admin_users') }}" class="admin-nav-link">👥 Users</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-10 admin-main">
+        <a href="{{ url_for('admin_courses') }}" class="admin-back-link">← Back to Courses</a>
+
+        <div class="admin-page-header-top">
+          <div>
+            <h1>📋 Lessons</h1>
+            <p class="admin-page-subtitle">{{ course.course_name }}</p>
+          </div>
+          <a href="{{ url_for('add_lesson', course_id=course.course_id) }}" class="btn-admin-add">➕ Add Lesson</a>
+        </div>
+
+        {% if lessons %}
+        <div class="admin-table-wrapper">
+          <div class="admin-table-head admin-cols-lessons">
+            {% for col in ['Order', 'Title', 'Type', 'XP', 'Actions'] %}
+            <span>{{ col }}</span>
+            {% endfor %}
+          </div>
+          {% for lesson in lessons %}
+          <div class="admin-table-row admin-cols-lessons">
+            <span class="admin-cell-order">{{ lesson.lesson_order }}</span>
+            <span class="admin-cell-title">{{ lesson.title }}</span>
+            <span class="badge-pill badge-type">{{ lesson.lesson_type|capitalize }}</span>
+            <span class="admin-cell-xp">⭐ {{ lesson.xp_reward }}</span>
+            <div class="admin-cell-actions">
+              <a href="{{ url_for('edit_lesson', lesson_id=lesson.lesson_id) }}" class="btn-action btn-action-edit">Edit</a>
+              <a href="{{ url_for('admin_course_quizzes', course_id=course.course_id) }}" class="btn-action btn-action-quizzes">Quizzes</a>
+              <form method="POST" action="{{ url_for('delete_lesson', lesson_id=lesson.lesson_id) }}" class="d-inline">
+                <button type="submit" onclick="return confirm('Delete this lesson?');" class="btn-action btn-action-delete">Delete</button>
+              </form>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+        {% else %}
+        <div class="admin-empty-state">
+          <div class="empty-icon">📭</div>
+          <h4>No lessons yet</h4>
+          <p>Add lessons to make this course interactive</p>
+          <a href="{{ url_for('add_lesson', course_id=course.course_id) }}" class="btn-admin-save" style="display:inline-block; text-decoration:none; padding: 0.65rem 1.5rem;">➕ Add First Lesson</a>
+        </div>
+        {% endif %}
+      </div>
+
+    </div>
+  </div>
+</div>
+{% endblock %}

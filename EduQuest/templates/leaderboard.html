@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% block title %}Leaderboard - EduQuest{% endblock %}
+
+{% block content %}
+<div style="min-height: 100vh; background: linear-gradient(135deg, #0d0d1a 0%, #1a0533 50%, #0d1a2e 100%); padding: 2.5rem 0;">
+  <div class="container">
+
+    <!-- Header -->
+    <div style="text-align: center; margin-bottom: 2.5rem;">
+      <h1 style="font-size: 2.2rem; font-weight: 800; color: #ffffff;">🏆 Leaderboard</h1>
+      <p style="color: #a78bfa; font-size: 1.05rem;">Top learners on EduQuest</p>
+    </div>
+
+    <div class="row justify-content-center">
+      <div class="col-lg-7">
+        <div style="background: rgba(255,255,255,0.05); border: 1px solid rgba(167,139,250,0.2); border-radius: 1.25rem; overflow: hidden; backdrop-filter: blur(10px);">
+
+          <!-- Table Header -->
+          <div style="display: grid; grid-template-columns: 70px 1fr auto; padding: 0.85rem 1.5rem; background: rgba(124,58,237,0.2); border-bottom: 1px solid rgba(167,139,250,0.2);">
+            <span style="color: #a78bfa; font-weight: 700; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05em;">Rank</span>
+            <span style="color: #a78bfa; font-weight: 700; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05em;">Username</span>
+            <span style="color: #a78bfa; font-weight: 700; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05em; text-align: right;">Total XP</span>
+          </div>
+
+          {% for entry in leaderboard %}
+            <div style="display: grid; grid-template-columns: 70px 1fr auto; padding: 1rem 1.5rem; border-bottom: 1px solid rgba(167,139,250,0.08); align-items: center; transition: background 0.2s;
+              {% if entry.user_id == current_user.user_id %}background: rgba(124,58,237,0.12);{% endif %}"
+              onmouseover="this.style.background='rgba(124,58,237,0.1)'"
+              onmouseout="this.style.background='{% if entry.user_id == current_user.user_id %}rgba(124,58,237,0.12){% else %}transparent{% endif %}'">
+
+              <!-- Rank -->
+              <span style="font-size: {% if entry.rank <= 3 %}1.5rem{% else %}1rem{% endif %}; font-weight: 700; color: #94a3b8;">
+                {% if entry.rank == 1 %}🥇
+                {% elif entry.rank == 2 %}🥈
+                {% elif entry.rank == 3 %}🥉
+                {% else %}{{ entry.rank }}{% endif %}
+              </span>
+
+              <!-- Username -->
+              <div style="display: flex; align-items: center; gap: 0.5rem;">
+                <div style="width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, #7c3aed, #6d28d9); display: flex; align-items: center; justify-content: center; font-weight: 700; color: #fff; font-size: 0.9rem; flex-shrink: 0;">
+                  {{ entry.user.username[0]|upper }}
+                </div>
+                <span style="color: #e2d9f3; font-weight: 600;">{{ entry.user.username }}</span>
+                {% if entry.user_id == current_user.user_id %}
+                  <span style="background: rgba(74,222,128,0.15); color: #4ade80; border: 1px solid rgba(74,222,128,0.3); padding: 0.1rem 0.55rem; border-radius: 999px; font-size: 0.75rem; font-weight: 700;">You</span>
+                {% endif %}
+              </div>
+
+              <!-- XP -->
+              <span style="background: rgba(245,158,11,0.15); color: #f59e0b; border: 1px solid rgba(245,158,11,0.3); padding: 0.25rem 0.75rem; border-radius: 999px; font-size: 0.85rem; font-weight: 700;">⭐ {{ entry.total_xp }} XP</span>
+            </div>
+          {% endfor %}
+
+          {% if not leaderboard %}
+            <div style="text-align: center; padding: 4rem 0; color: #475569;">
+              <div style="font-size: 3.5rem; margin-bottom: 1rem;">🏆</div>
+              <h4 style="color: #e2d9f3;">No rankings yet</h4>
+              <p>Be the first to earn XP!</p>
+            </div>
+          {% endif %}
+
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

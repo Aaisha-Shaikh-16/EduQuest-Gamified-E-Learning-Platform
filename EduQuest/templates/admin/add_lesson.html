@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}Add Lesson - Admin{% endblock %}
+
+{% block content %}
+<div class="admin-page-wrapper-padded">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-lg-9">
+        <div class="admin-form-card">
+          <h2 class="admin-form-title">➕ Add Lesson</h2>
+          <p class="admin-form-subtitle">Course: <span>{{ course.course_name }}</span></p>
+          <form method="POST">
+            <div class="admin-form-group">
+              <label class="admin-label">Lesson Title</label>
+              <input type="text" name="title" required class="admin-input">
+            </div>
+            <div class="admin-form-group">
+              <label class="admin-label">Lesson Content</label>
+              <small class="admin-hint">Use HTML for formatting. Include exercises and interactive elements.</small>
+              <textarea name="content" rows="10" required class="admin-textarea admin-textarea-mono"></textarea>
+            </div>
+            <div class="row">
+              <div class="col-md-4 mb-3">
+                <label class="admin-label">Order</label>
+                <input type="number" name="lesson_order" value="{{ next_order }}" required class="admin-input">
+              </div>
+              <div class="col-md-4 mb-3">
+                <label class="admin-label">Type</label>
+                <select name="lesson_type" required class="admin-select">
+                  <option value="text">Text</option>
+                  <option value="video">Video</option>
+                  <option value="exercise" selected>Exercise</option>
+                </select>
+              </div>
+              <div class="col-md-4 mb-3">
+                <label class="admin-label">XP Reward</label>
+                <input type="number" name="xp_reward" value="20" required class="admin-input">
+              </div>
+            </div>
+            <div class="admin-form-actions">
+              <button type="submit" class="btn-admin-save">💾 Save Lesson</button>
+              <a href="{{ url_for('admin_course_lessons', course_id=course.course_id) }}" class="btn-admin-cancel">✕ Cancel</a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

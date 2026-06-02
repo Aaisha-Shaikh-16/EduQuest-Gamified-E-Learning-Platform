@@ -1,0 +1,158 @@
+{% extends "base.html" %}
+{% block title %}{{ course.course_name }} - EduQuest{% endblock %}
+{% block content %}
+<div style="min-height: 100vh; background: linear-gradient(135deg, #0d0d1a 0%, #1a0533 50%, #0d1a2e 100%); padding: 2.5rem 0;">
+  <div class="container">
+    <div class="row">
+
+      <!-- Main Content -->
+      <div class="col-lg-8 mb-4">
+        <div style="background: rgba(255,255,255,0.05); border: 1px solid rgba(167,139,250,0.2); border-radius: 1rem; padding: 2rem; backdrop-filter: blur(10px);">
+
+          <span style="padding: 0.25rem 0.75rem; border-radius: 999px; font-size: 0.75rem; font-weight: 700; margin-bottom: 1rem; display: inline-block;
+            {% if course.difficulty == 'beginner' %}background: rgba(74,222,128,0.15); color: #4ade80; border: 1px solid rgba(74,222,128,0.3);
+            {% elif course.difficulty == 'intermediate' %}background: rgba(251,191,36,0.15); color: #fbbf24; border: 1px solid rgba(251,191,36,0.3);
+            {% else %}background: rgba(248,113,113,0.15); color: #f87171; border: 1px solid rgba(248,113,113,0.3);{% endif %}">
+            {{ course.difficulty|capitalize }}
+          </span>
+
+          <h1 style="color: #ffffff; font-weight: 800; font-size: 2rem; margin-bottom: 0.75rem;">{{ course.course_name }}</h1>
+          <p style="color: #94a3b8; font-size: 1rem; margin-bottom: 1.5rem;">{{ course.description }}</p>
+
+          <hr style="border-color: rgba(167,139,250,0.15); margin-bottom: 1.5rem;">
+
+          {% if not current_user.is_authenticated %}
+            <div style="background: rgba(56,189,248,0.1); border: 1px solid rgba(56,189,248,0.25); border-radius: 0.75rem; padding: 1rem; margin-bottom: 1.5rem; color: #7dd3fc;">
+              ℹ️ <a href="{{ url_for('login') }}" style="color: #a78bfa;">Login</a> or
+              <a href="{{ url_for('register') }}" style="color: #a78bfa;">Register</a> to enroll in this course
+            </div>
+
+          {% elif not enrollment and not can_access %}
+            <div style="background: rgba(251,191,36,0.1); border: 1px solid rgba(251,191,36,0.25); border-radius: 0.75rem; padding: 1rem; margin-bottom: 1.5rem; color: #fbbf24;">
+              🔒 This course requires {{ course.required_xp }} XP to unlock. You currently have {{ current_user.total_xp }} XP.
+            </div>
+
+          {% elif not enrollment %}
+            <form method="POST" action="{{ url_for('enroll_course', course_id=course.course_id) }}" class="mb-4">
+              <button type="submit" style="width: 100%; background: linear-gradient(135deg, #7c3aed, #6d28d9); color: #fff; padding: 0.85rem; border-radius: 0.75rem; border: none; font-weight: 700; font-size: 1rem; cursor: pointer; box-shadow: 0 4px 15px rgba(124,58,237,0.4);">
+                ➕ Enroll in this Course
+              </button>
+            </form>
+
+          {% else %}
+            <div style="background: rgba(74,222,128,0.1); border: 1px solid rgba(74,222,128,0.25); border-radius: 0.75rem; padding: 1rem; margin-bottom: 1.5rem;">
+              <span style="color: #4ade80; font-weight: 600;">✅ You are enrolled in this course</span>
+              <div style="margin-top: 0.75rem;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 0.4rem;">
+                  <small style="color: #94a3b8;">Progress</small>
+                  <small style="color: #a78bfa; font-weight: 700;">{{ "%.0f"|format(enrollment.progress) }}%</small>
+                </div>
+                <div style="background: rgba(255,255,255,0.1); border-radius: 999px; height: 10px; overflow: hidden;">
+                  <div style="width: {{ enrollment.progress }}%; height: 100%; background: linear-gradient(90deg, #7c3aed, #a78bfa); border-radius: 999px;"></div>
+                </div>
+              </div>
+            </div>
+          {% endif %}
+
+          <!-- Lessons List -->
+          <h3 style="color: #ffffff; font-weight: 700; margin-bottom: 1rem;">📋 Course Lessons</h3>
+          {% set lessons = course.lessons|sort(attribute='lesson_order') %}
+          {% if lessons %}
+            {% for lesson in lessons %}
+              {% set lesson_progress = lesson.progress|selectattr('user_id', 'equalto', current_user.user_id)|first if current_user.is_authenticated and enrollment else none %}
+              {% if current_user.is_authenticated and enrollment %}
+                <a href="{{ url_for('view_lesson', lesson_id=lesson.lesson_id) }}" style="text-decoration: none;">
+              {% else %}
+                <div>
+              {% endif %}
+                <div style="background: rgba(255,255,255,0.04); border: 1px solid rgba(167,139,250,0.12); border-radius: 0.75rem; padding: 1rem; margin-bottom: 0.6rem; display: flex; justify-content: space-between; align-items: center; transition: background 0.2s;"
+                     {% if current_user.is_authenticated and enrollment %}
+                     onmouseover="this.style.background='rgba(124,58,237,0.12)'"
+                     onmouseout="this.style.background='rgba(255,255,255,0.04)'"
+                     {% endif %}>
+                  <div>
+                    <span style="color: #e2d9f3; font-weight: 600; font-size: 0.95rem;">
+                      {{ lesson.lesson_order }}. {{ lesson.title }}
+                      {% if lesson_progress and lesson_progress.completed %}
+                        <span style="color: #4ade80; margin-left: 0.4rem;">✅</span>
+                      {% endif %}
+                    </span>
+                    <br>
+                    <small style="color: #475569;">{{ lesson.lesson_type|capitalize }}</small>
+                  </div>
+                  <span style="background: rgba(167,139,250,0.15); color: #a78bfa; border: 1px solid rgba(167,139,250,0.3); padding: 0.2rem 0.6rem; border-radius: 999px; font-size: 0.8rem; font-weight: 700;">{{ lesson.xp_reward }} XP</span>
+                </div>
+              {% if current_user.is_authenticated and enrollment %}
+                </a>
+              {% else %}
+                </div>
+              {% endif %}
+            {% endfor %}
+          {% else %}
+            <p style="color: #475569; text-align: center; padding: 2rem 0;">No lessons available yet.</p>
+          {% endif %}
+
+          {% if enrollment and enrollment.status == 'completed' %}
+            <div style="background: rgba(251,191,36,0.1); border: 1px solid rgba(251,191,36,0.3); border-radius: 0.75rem; padding: 1rem; text-align: center; margin-top: 1rem; color: #fbbf24; font-weight: 700;">
+              🏆 Course Completed!
+            </div>
+          {% endif %}
+
+        </div>
+      </div>
+
+      <!-- Sidebar -->
+      <div class="col-lg-4">
+        <!-- Course Info -->
+        <div style="background: rgba(255,255,255,0.05); border: 1px solid rgba(167,139,250,0.2); border-radius: 1rem; padding: 1.5rem; margin-bottom: 1.5rem; backdrop-filter: blur(10px);">
+          <h5 style="color: #ffffff; font-weight: 700; margin-bottom: 1rem;">ℹ️ Course Info</h5>
+          <hr style="border-color: rgba(167,139,250,0.15);">
+          <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span style="color: #94a3b8; font-size: 0.9rem;">Difficulty</span>
+              <span style="padding: 0.2rem 0.65rem; border-radius: 999px; font-size: 0.8rem; font-weight: 700;
+                {% if course.difficulty == 'beginner' %}background: rgba(74,222,128,0.15); color: #4ade80;
+                {% elif course.difficulty == 'intermediate' %}background: rgba(251,191,36,0.15); color: #fbbf24;
+                {% else %}background: rgba(248,113,113,0.15); color: #f87171;{% endif %}">
+                {{ course.difficulty|capitalize }}
+              </span>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span style="color: #94a3b8; font-size: 0.9rem;">XP Reward</span>
+              <span style="background: rgba(245,158,11,0.15); color: #f59e0b; border: 1px solid rgba(245,158,11,0.3); padding: 0.2rem 0.65rem; border-radius: 999px; font-size: 0.8rem; font-weight: 700;">⭐ {{ course.xp_reward }} XP</span>
+            </div>
+            {% if course.required_xp > 0 %}
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span style="color: #94a3b8; font-size: 0.9rem;">Required XP</span>
+              <span style="color: #e2d9f3; font-weight: 600;">{{ course.required_xp }} XP</span>
+            </div>
+            {% endif %}
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span style="color: #94a3b8; font-size: 0.9rem;">Lessons</span>
+              <span style="color: #e2d9f3; font-weight: 600;">{{ course.lessons|length }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quizzes -->
+        {% if current_user.is_authenticated and enrollment and quizzes %}
+        <div style="background: rgba(255,255,255,0.05); border: 1px solid rgba(167,139,250,0.2); border-radius: 1rem; padding: 1.5rem; backdrop-filter: blur(10px);">
+          <h5 style="color: #ffffff; font-weight: 700; margin-bottom: 1rem;">❓ Quizzes</h5>
+          <hr style="border-color: rgba(167,139,250,0.15);">
+          {% for quiz in quizzes %}
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.65rem 0; border-bottom: 1px solid rgba(255,255,255,0.06);">
+              <span style="color: #e2d9f3; font-size: 0.9rem;">Quiz {{ loop.index }}</span>
+              <a href="{{ url_for('quiz', quiz_id=quiz.quiz_id) }}"
+                 style="background: linear-gradient(135deg, #7c3aed, #6d28d9); color: #fff; padding: 0.35rem 0.85rem; border-radius: 0.5rem; text-decoration: none; font-size: 0.85rem; font-weight: 600;">
+                Take →
+              </a>
+            </div>
+          {% endfor %}
+        </div>
+        {% endif %}
+
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

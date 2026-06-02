@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block title %}Manage Users - Admin{% endblock %}
+
+{% block content %}
+<div class="admin-page-wrapper">
+  <div class="container-fluid">
+    <div class="row">
+
+      <div class="col-md-2 admin-sidebar-col">
+        <div class="admin-sidebar-inner">
+          <h6 class="admin-sidebar-title">Admin Panel</h6>
+          <div class="admin-nav">
+            <a href="{{ url_for('admin_dashboard') }}" class="admin-nav-link">📊 Dashboard</a>
+            <a href="{{ url_for('admin_courses') }}" class="admin-nav-link">📚 Courses</a>
+            <a href="{{ url_for('admin_users') }}" class="admin-nav-link active">👥 Users</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-10 admin-main">
+        <h1 class="admin-page-title">👥 Manage Users</h1>
+
+        <div class="admin-table-wrapper">
+          <div class="admin-table-head admin-cols-users">
+            {% for col in ['ID', 'Username', 'Email', 'Role', 'Total XP', 'Joined', 'Actions'] %}
+            <span>{{ col }}</span>
+            {% endfor %}
+          </div>
+          {% for user in users %}
+          <div class="admin-table-row admin-cols-users">
+            <span class="admin-cell-id">#{{ user.user_id }}</span>
+            <div class="admin-user-cell">
+              <div class="admin-avatar admin-avatar-sm">{{ user.username[0]|upper }}</div>
+              <span class="admin-cell-title">{{ user.username }}</span>
+            </div>
+            <span class="admin-cell-muted">{{ user.email }}</span>
+            <span class="badge-pill {% if user.role == 'admin' %}badge-role-admin{% else %}badge-role-user{% endif %}">
+              {{ user.role|capitalize }}
+            </span>
+            <span class="badge-pill badge-xp">⭐ {{ user.total_xp }}</span>
+            <small class="admin-cell-date">{{ user.created_at.strftime('%b %d, %Y') }}</small>
+            <div>
+              {% if user.user_id != current_user.user_id %}
+              <form method="POST" action="{{ url_for('delete_user', user_id=user.user_id) }}" class="d-inline">
+                <button type="submit" data-confirm-delete class="btn-action btn-action-delete">Delete</button>
+              </form>
+              {% endif %}
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+{% endblock %}

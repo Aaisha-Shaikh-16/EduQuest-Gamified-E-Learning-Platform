@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block title %}Admin Dashboard - EduQuest{% endblock %}
+
+{% block content %}
+<div class="admin-page-wrapper">
+  <div class="container-fluid">
+    <div class="row">
+
+      <div class="col-md-2 admin-sidebar-col">
+        <div class="admin-sidebar-inner">
+          <h6 class="admin-sidebar-title">Admin Panel</h6>
+          <div class="admin-nav">
+            <a href="{{ url_for('admin_dashboard') }}" class="admin-nav-link active">📊 Dashboard</a>
+            <a href="{{ url_for('admin_courses') }}" class="admin-nav-link">📚 Courses</a>
+            <a href="{{ url_for('admin_users') }}" class="admin-nav-link">👥 Users</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-10 admin-main">
+        <h1 class="admin-page-title">📊 Admin Dashboard</h1>
+
+        <div class="row mb-4">
+          {% for icon, color, val, label in [('👥', '#38bdf8', total_users, 'Total Users'), ('📚', '#4ade80', total_courses, 'Total Courses'), ('📋', '#a78bfa', total_enrollments, 'Total Enrollments')] %}
+          <div class="col-md-4 mb-3">
+            <div class="stat-card">
+              <div class="stat-card-icon">{{ icon }}</div>
+              <h2 class="stat-card-value" style="color: {{ color }};">{{ val }}</h2>
+              <p class="stat-card-label">{{ label }}</p>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+
+        <div class="admin-table-wrapper">
+          <div class="admin-table-section-header">
+            <h4>👤 Recent Users</h4>
+          </div>
+          <div class="admin-table-head admin-cols-dashboard">
+            <span>Username</span>
+            <span>Email</span>
+            <span>Total XP</span>
+            <span style="padding-left: 1rem;">Joined</span>
+          </div>
+          {% for user in recent_users %}
+          <div class="admin-table-row admin-cols-dashboard">
+            <div class="admin-user-cell">
+              <div class="admin-avatar">{{ user.username[0]|upper }}</div>
+              <span class="admin-cell-title">{{ user.username }}</span>
+            </div>
+            <span class="admin-cell-muted">{{ user.email }}</span>
+            <span class="badge-pill badge-xp">⭐ {{ user.total_xp }} XP</span>
+            <small class="admin-cell-date" style="padding-left: 1rem;">{{ user.created_at.strftime('%b %d, %Y') }}</small>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+{% endblock %}

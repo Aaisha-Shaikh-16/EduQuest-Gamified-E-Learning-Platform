@@ -1,0 +1,187 @@
+{% extends "base.html" %}
+{% block title %}Register - EduQuest{% endblock %}
+
+{% block content %}
+<div style="min-height: 100vh; background: linear-gradient(135deg, #0d0d1a 0%, #1a0a2e 50%, #2d1b69 100%); display: flex; align-items: center; justify-content: center; padding: 2rem;">
+
+  <!-- Floating background elements -->
+  <div style="position: fixed; top: 10%; left: 5%; font-size: 5rem; opacity: 0.12; animation: float 6s ease-in-out infinite;">🏆</div>
+  <div style="position: fixed; top: 60%; left: 8%; font-size: 4rem; opacity: 0.12; animation: float 8s ease-in-out infinite 2s;">🎯</div>
+  <div style="position: fixed; top: 20%; right: 5%; font-size: 4.5rem; opacity: 0.12; animation: float 7s ease-in-out infinite 1s;">🎮</div>
+  <div style="position: fixed; bottom: 20%; right: 8%; font-size: 5rem; opacity: 0.12; animation: float 5s ease-in-out infinite 3s;">⭐</div>
+
+  <div style="width: 100%; max-width: 440px;">
+
+    <!-- Branding -->
+    <div style="text-align: center; margin-bottom: 2rem;">
+      <div style="font-size: 3rem; margin-bottom: 0.5rem;">🎓</div>
+      <h1 style="color: #ffffff; font-size: 2rem; font-weight: 800; margin: 0; letter-spacing: -0.5px;">
+        <span style="color: #ffffff;">Reg</span><span style="color: #a78bfa;">ister</span>
+      </h1>
+      <p style="color: #94a3b8; margin: 0.25rem 0 0 0; font-size: 0.9rem;">Begin your learning adventure!</p>
+    </div>
+
+    <!-- Card -->
+    <div style="background: rgba(30, 20, 60, 0.7); backdrop-filter: blur(20px); border: 1px solid rgba(167,139,250,0.15); border-radius: 1.25rem; padding: 2.5rem; box-shadow: 0 25px 50px rgba(0,0,0,0.5);">
+
+      <h2 style="color: #ffffff; font-size: 1.3rem; font-weight: 700; margin: 0 0 1.75rem 0; text-align: center;">
+        ⚔️ Create Your Account
+      </h2>
+
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          {% for category, message in messages %}
+            <div style="background: rgba(239,68,68,0.15); border: 1px solid rgba(239,68,68,0.3); color: #fca5a5; border-radius: 0.75rem; padding: 0.75rem 1rem; margin-bottom: 1.25rem; font-size: 0.875rem;">
+              ⚠️ {{ message }}
+            </div>
+          {% endfor %}
+        {% endif %}
+      {% endwith %}
+
+      <form method="POST" onsubmit="return validateEmail('reg-email', 'reg-email-error') && checkMatchOnSubmit()">
+        <!-- Username -->
+        <div style="margin-bottom: 1.1rem;">
+          <label style="display: block; color: #94a3b8; font-size: 0.78rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.45rem;">
+            🧙 Username
+          </label>
+          <input type="text" name="username" required
+            style="width: 100%; padding: 0.75rem 1rem; background: rgba(255,255,255,0.05); border: 1px solid rgba(167,139,250,0.2); border-radius: 0.75rem; color: #ffffff; font-size: 0.95rem; outline: none; box-sizing: border-box; transition: border-color 0.2s;"
+            placeholder="Choose your hero name"
+            onfocus="this.style.borderColor='#7c3aed'"
+            onblur="this.style.borderColor='rgba(167,139,250,0.2)'">
+        </div>
+
+        <!-- Email -->
+        <div style="margin-bottom: 1.1rem;">
+          <label style="display: block; color: #94a3b8; font-size: 0.78rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.45rem;">
+            📧 Email Address
+          </label>
+          <input type="email" name="email" required id="reg-email"
+          style="width: 100%; padding: 0.75rem 1rem; background: rgba(255,255,255,0.05); border: 1px solid rgba(167,139,250,0.2); border-radius: 0.75rem; color: #ffffff; font-size: 0.95rem; outline: none; box-sizing: border-box; transition: border-color 0.2s;"
+          placeholder="hero@eduquest.com"
+          onfocus="this.style.borderColor='#7c3aed'"
+          onblur="validateEmail('reg-email', 'reg-email-error')">
+          <p id="reg-email-error" style="color:#ef4444; font-size:0.75rem; margin:0.3rem 0 0 0;"></p>
+        </div>
+
+        <!-- Password -->
+        <div style="margin-bottom: 1.1rem;">
+          <label style="display: block; color: #94a3b8; font-size: 0.78rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.45rem;">
+            🔒 Password
+          </label>
+          <input type="password" name="password" required id="password"
+            style="width: 100%; padding: 0.75rem 1rem; background: rgba(255,255,255,0.05); border: 1px solid rgba(167,139,250,0.2); border-radius: 0.75rem; color: #ffffff; font-size: 0.95rem; outline: none; box-sizing: border-box; transition: border-color 0.2s;"
+            placeholder="Create a strong password"
+            onfocus="this.style.borderColor='#7c3aed'"
+            onblur="this.style.borderColor='rgba(167,139,250,0.2)'"
+            oninput="checkStrength(this.value)">
+          <div style="margin-top: 0.5rem; height: 4px; background: rgba(255,255,255,0.08); border-radius: 2px; overflow: hidden;">
+            <div id="strengthBar" style="height: 100%; width: 0%; border-radius: 2px; transition: all 0.3s;"></div>
+          </div>
+          <p id="strengthText" style="color: #64748b; font-size: 0.75rem; margin: 0.3rem 0 0 0;"></p>
+        </div>
+
+        <!-- Confirm Password -->
+        <div style="margin-bottom: 1.75rem;">
+          <label style="display: block; color: #94a3b8; font-size: 0.78rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.45rem;">
+            🔑 Confirm Password
+          </label>
+          <input type="password" name="confirm_password" required id="confirm_password"
+            style="width: 100%; padding: 0.75rem 1rem; background: rgba(255,255,255,0.05); border: 1px solid rgba(167,139,250,0.2); border-radius: 0.75rem; color: #ffffff; font-size: 0.95rem; outline: none; box-sizing: border-box; transition: border-color 0.2s;"
+            placeholder="Repeat your password"
+            onfocus="this.style.borderColor='#7c3aed'"
+            onblur="this.style.borderColor='rgba(167,139,250,0.2)'"
+            oninput="checkMatch()">
+          <p id="matchText" style="font-size: 0.75rem; margin: 0.3rem 0 0 0;"></p>
+        </div>
+
+        <button type="submit"
+          style="width: 100%; padding: 0.875rem; background: linear-gradient(135deg, #7c3aed, #6d28d9); border: none; border-radius: 0.75rem; color: #ffffff; font-size: 1rem; font-weight: 700; cursor: pointer; letter-spacing: 0.025em; transition: transform 0.15s, box-shadow 0.15s; box-shadow: 0 4px 20px rgba(124,58,237,0.5);"
+          onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 8px 30px rgba(124,58,237,0.65)'"
+          onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 20px rgba(124,58,237,0.5)'">
+          🚀 Join the Quest
+        </button>
+      </form>
+
+      <div style="text-align: center; margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid rgba(167,139,250,0.1);">
+        <p style="color: #64748b; font-size: 0.875rem; margin: 0;">
+          Already an adventurer?
+          <a href="{{ url_for('login') }}" style="color: #a78bfa; font-weight: 600; text-decoration: none;">
+            Login here →
+          </a>
+        </p>
+      </div>
+    </div>
+
+    <p style="text-align: center; color: #334155; font-size: 0.75rem; margin-top: 1.5rem;">
+      © 2026 EduQuest · Gamified E-Learning Platform
+    </p>
+  </div>
+</div>
+
+<style>
+  @keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-20px); }
+  }
+  body { background: #0d0d1a !important; }
+  input::placeholder { color: #475569; }
+</style>
+
+<script>
+  function checkStrength(val) {
+    const bar = document.getElementById('strengthBar');
+    const text = document.getElementById('strengthText');
+    let score = 0;
+    if (val.length >= 8) score++;
+    if (/[A-Z]/.test(val)) score++;
+    if (/[0-9]/.test(val)) score++;
+    if (/[^A-Za-z0-9]/.test(val)) score++;
+    const levels = [
+      { width: '25%', color: '#ef4444', label: '🔴 Weak' },
+      { width: '50%', color: '#f97316', label: '🟠 Fair' },
+      { width: '75%', color: '#eab308', label: '🟡 Good' },
+      { width: '100%', color: '#22c55e', label: '🟢 Strong' },
+    ];
+    if (val.length === 0) { bar.style.width = '0%'; text.textContent = ''; return; }
+    const level = levels[score - 1] || levels[0];
+    bar.style.width = level.width;
+    bar.style.background = level.color;
+    text.textContent = level.label;
+    text.style.color = level.color;
+  }
+
+  function checkMatch() {
+    const p = document.getElementById('password').value;
+    const c = document.getElementById('confirm_password').value;
+    const text = document.getElementById('matchText');
+    if (c.length === 0) { text.textContent = ''; return; }
+    if (p === c) {
+      text.textContent = '✅ Passwords match!';
+      text.style.color = '#22c55e';
+    } else {
+      text.textContent = '❌ Passwords do not match';
+      text.style.color = '#ef4444';
+    }
+  }
+  function validateEmail(inputId, errorId) {
+    const val = document.getElementById(inputId).value;
+    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+    const error = document.getElementById(errorId);
+    if (!regex.test(val)) {
+      error.textContent = '⚠️ Please enter a valid email (e.g. user@example.com)';
+      document.getElementById(inputId).style.borderColor = '#ef4444';
+      return false;
+    }
+    error.textContent = '';
+    document.getElementById(inputId).style.borderColor = '#22c55e';
+    return true;
+  }
+
+  function checkMatchOnSubmit() {
+    const p = document.getElementById('password').value;
+    const c = document.getElementById('confirm_password').value;
+    return p === c;
+  }
+</script>
+{% endblock %}

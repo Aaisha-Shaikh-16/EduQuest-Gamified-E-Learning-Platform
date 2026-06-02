@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block title %}Edit Quiz{% endblock %}
+
+{% block content %}
+<div class="admin-page-wrapper-padded">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-lg-7">
+        <div class="admin-form-card">
+          <h2 class="admin-form-title">✏️ Edit Quiz</h2>
+          <p class="admin-form-subtitle">Course: <span>{{ course.course_name }}</span></p>
+          <form method="POST">
+            <div class="admin-form-group">
+              <label class="admin-label">Link to Lesson</label>
+              <select name="lesson_id" required class="admin-select">
+                <option value="">Select a lesson...</option>
+                {% for lesson in lessons %}
+                  <option value="{{ lesson.lesson_id }}" {% if quiz.lesson_id == lesson.lesson_id %}selected{% endif %}>{{ lesson.lesson_order }}. {{ lesson.title }}</option>
+                {% endfor %}
+              </select>
+              <small class="admin-hint">Quiz will auto-complete the linked lesson when answered correctly</small>
+            </div>
+            <div class="admin-form-group">
+              <label class="admin-label">Question</label>
+              <textarea name="question" rows="3" required class="admin-textarea">{{ quiz.question }}</textarea>
+            </div>
+            <div class="row">
+              {% for opt, val in [('a', quiz.opt_a), ('b', quiz.opt_b), ('c', quiz.opt_c), ('d', quiz.opt_d)] %}
+              <div class="col-md-6 mb-3">
+                <label class="admin-label">Option {{ opt|upper }}</label>
+                <input type="text" name="opt_{{ opt }}" value="{{ val }}" required class="admin-input">
+              </div>
+              {% endfor %}
+            </div>
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label class="admin-label">Correct Answer</label>
+                <select name="correct_opt" required class="admin-select">
+                  {% for opt in ['A', 'B', 'C', 'D'] %}
+                  <option value="{{ opt }}" {% if quiz.correct_opt == opt %}selected{% endif %}>{{ opt }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+            <div class="admin-form-actions">
+              <button type="submit" class="btn-admin-save">✔ Update Quiz</button>
+              <a href="{{ url_for('admin_course_quizzes', course_id=course.course_id) }}" class="btn-admin-cancel">✕ Cancel</a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
