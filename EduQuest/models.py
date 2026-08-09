@@ -12,7 +12,7 @@ class User(UserMixin, db.Model):
     username = db.Column(db.String(50), unique=True, nullable=False)
     email = db.Column(db.String(100), unique=True, nullable=False)
     password_hash = db.Column(db.String(255), nullable=False)
-    role = db.Column(db.Enum('student', 'admin'), default='student')
+    role = db.Column(db.Enum('student', 'admin', name='role'), default='student')
     total_xp = db.Column(db.Integer, default=0)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     
@@ -36,7 +36,7 @@ class Course(db.Model):
     course_name = db.Column(db.String(100), nullable=False)
     description = db.Column(db.Text)
     content = db.Column(db.Text)
-    difficulty = db.Column(db.Enum('beginner', 'intermediate', 'advanced'), default='beginner')
+    difficulty = db.Column(db.Enum('beginner', 'intermediate', 'advanced', name='course_difficulty'), default='beginner')
     is_paid = db.Column(db.Boolean, default=False)
     required_xp = db.Column(db.Integer, default=0)
     xp_reward = db.Column(db.Integer, default=100)
@@ -55,7 +55,7 @@ class Lesson(db.Model):
     title = db.Column(db.String(200), nullable=False)
     content = db.Column(db.Text, nullable=False)
     lesson_order = db.Column(db.Integer, default=0)
-    lesson_type = db.Column(db.Enum('text', 'video', 'exercise'), default='text')
+    lesson_type = db.Column(db.Enum('text', 'video', 'exercise', name='lesson_type'), default='text')
     xp_reward = db.Column(db.Integer, default=20)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     
@@ -79,7 +79,7 @@ class Enrollment(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'), nullable=False)
     course_id = db.Column(db.Integer, db.ForeignKey('courses.course_id'), nullable=False)
     progress = db.Column(db.Numeric(5, 2), default=0.00)
-    status = db.Column(db.Enum('active', 'completed'), default='active')
+    status = db.Column(db.Enum('active', 'completed', name='status'), default='active')
     enrolled_at = db.Column(db.DateTime, default=datetime.utcnow)
     completed_at = db.Column(db.DateTime)
 
@@ -94,7 +94,7 @@ class Quiz(db.Model):
     opt_b = db.Column(db.String(255), nullable=False)
     opt_c = db.Column(db.String(255), nullable=False)
     opt_d = db.Column(db.String(255), nullable=False)
-    correct_opt = db.Column(db.Enum('A', 'B', 'C', 'D'), nullable=False)
+    correct_opt = db.Column(db.Enum('A', 'B', 'C', 'D', name='correct_option'), nullable=False)
     # xp_reward = db.Column(db.Integer, default=10)
     
     lesson = db.relationship('Lesson', backref='quizzes')
